@@ -1,0 +1,30 @@
+{
+  "name": "fsm",
+  "version": "0.0.1",
+  "description": "JavaScript Finite State Machine",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "compile": "web-crack",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@lib/emitter": "evgkch/emitterjs#v1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~4.3.5",
+    "web-crack": "evgkch/web-crack#v1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evgkch/fsmjs.git"
+  },
+  "keywords": [
+    "fsm",
+    "js"
+  ],
+  "author": "Evgeny Kucherenko",
+  "license": "MIT",
+  "homepage": "https://github.com/evgkch/fsmjs"
+}
