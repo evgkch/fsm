@@ -1,5 +1,5 @@
-import Emitter, { IEvent } from '@lib/emitter';
-import { Contracts } from '@lib/emitter/src/contracts';
+import Emitter, { IEvent } from '@lib/emitterjs';
+import { Contracts } from '@lib/emitterjs/src/contracts';
 
 type StateType = string | number;
 
