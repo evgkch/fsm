@@ -10,7 +10,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@lib/emitter": "evgkch/emitterjs#v1.0.0"
+    "@lib/emitterjs": "evgkch/emitterjs#v1.0.0"
   },
   "devDependencies": {
     "typescript": "~4.3.5",

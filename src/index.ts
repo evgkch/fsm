@@ -13,31 +13,36 @@ interface IDispatcher {
 
 export type Transition<S extends IState> = {
     to: S['type'];
-    update?: (state: Omit<S, 'type'>, event: IEvent) => { [key in S['type']]: Omit<S, 'type'> };
+    update?: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;
     if: (event: IEvent, state: Omit<S, 'type'>) => boolean;
-}
-
-export type Scheme<S extends IState> = {
-    [key in S['type']]: Transition<S>[];
 };
 
-class FSM<S extends IState> implements IReceiver<S>, IDispatcher {
+export type Scheme<S extends IState> = {
+    [key in S['type']]?: Transition<S>[];
+};
+
+class TransitionEvent<S extends IState> implements IEvent {
+    type = Symbol('transition')
+    constructor(public map: [S['type'], S['type']]) {}
+}
+
+class FSM<S extends IState> implements IReceiver<S>, IDispatcher {    
 
     #emitter: Emitter<S> = new Emitter;
     #scheme: Scheme<S>;
     #state: S;
 
-    constructor(scheme: Scheme<S>, initialState: S) {        
-        this.#scheme = scheme;
+    constructor(scheme: Scheme<S>, initialState: S) { 
+        this.#scheme = scheme;      
         this.#state = initialState;
     }
 
-    get pointer(): S['type'] {
+    get type(): S['type'] {
         return this.#state.type;
     }
 
     dispatch(event: IEvent): void {
-        const transitions = this.#scheme[this.pointer];
+        const transitions = this.#scheme[this.type];
         if (transitions)
         {
             const transition = transitions.find((transition: Transition<S>) =>
