@@ -21,16 +21,15 @@ export type Scheme<S extends IState> = {
 };
 
 export interface IFSM<S extends IState> extends IDispatcher, IReceiver<S> {    
-    readonly scheme: Scheme<S>;
-    readonly state: S;    
+    readonly scheme: Scheme<S>;       
     readonly isActive: boolean; 
 }
 
 class FSM<S extends IState> implements IFSM<S> {    
 
     private emitter: Emitter<S> = new Emitter;
-    scheme: Scheme<S>;
-    state: S;
+    private state: S;
+    scheme: Scheme<S>;    
 
     constructor(scheme: Scheme<S>, initialState: S) { 
         this.scheme = scheme;      
@@ -62,12 +61,12 @@ class FSM<S extends IState> implements IFSM<S> {
             }
         }
         else        
-            this.emitter.events.forEach(this.emitter.offAll);        
+            this.emitter.events.forEach(this.emitter.offAll.bind(this.emitter));        
     }
 
-    on = this.emitter.on;
+    on = this.emitter.on.bind(this.emitter);
 
-    off = this.emitter.off;
+    off = this.emitter.off.bind(this.emitter);
 }
 
 export default FSM;
