@@ -1,8 +1,9 @@
 {
-  "name": "fsm",
-  "version": "0.0.1",
+  "name": "fsmjs",
+  "version": "1.0.0",
   "description": "JavaScript Finite State Machine",
   "main": "dist/index.js",
+  "browser": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",

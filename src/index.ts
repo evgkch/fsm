@@ -1,11 +1,6 @@
-import Emitter, { IEvent } from '@lib/emitterjs';
-import { Contracts } from '@lib/emitterjs/src/contracts';
+import Emitter, { IEvent, IReceiver } from '/@lib/emitterjs';
 
-type StateType = string | number;
-
-export interface IState extends Contracts.IEvent<StateType> {};
-
-interface IReceiver<S extends IState> extends Contracts.IReceiver<StateType, S> {};
+export interface IState extends IEvent {};
 
 interface IDispatcher {
     dispatch(event: IEvent): any;
@@ -13,60 +8,66 @@ interface IDispatcher {
 
 export type Transition<S extends IState> = {
     to: S['type'];
-    update?: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;
     if: (event: IEvent, state: Omit<S, 'type'>) => boolean;
+    update?: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;    
+} | {
+    to?: S['type'];
+    if: (event: IEvent, state: Omit<S, 'type'>) => boolean;
+    update: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;    
 };
 
 export type Scheme<S extends IState> = {
     [key in S['type']]?: Transition<S>[];
 };
 
-class TransitionEvent<S extends IState> implements IEvent {
-    type = Symbol('transition')
-    constructor(public map: [S['type'], S['type']]) {}
+export interface IFSM<S extends IState> extends IDispatcher, IReceiver<S> {    
+    readonly scheme: Scheme<S>;
+    readonly state: S;    
+    readonly isActive: boolean; 
 }
 
-class FSM<S extends IState> implements IReceiver<S>, IDispatcher {    
+class FSM<S extends IState> implements IFSM<S> {    
 
-    #emitter: Emitter<S> = new Emitter;
-    #scheme: Scheme<S>;
-    #state: S;
+    private emitter: Emitter<S> = new Emitter;
+    scheme: Scheme<S>;
+    state: S;
 
     constructor(scheme: Scheme<S>, initialState: S) { 
-        this.#scheme = scheme;      
-        this.#state = initialState;
+        this.scheme = scheme;      
+        this.state = initialState;
     }
 
-    get type(): S['type'] {
-        return this.#state.type;
+    get isActive(): boolean {
+        return this.state.type in this.scheme;
     }
 
     dispatch(event: IEvent): void {
-        const transitions = this.#scheme[this.type];
-        if (transitions)
+        if (this.isActive)
         {
-            const transition = transitions.find((transition: Transition<S>) =>
-                transition.if(event, this.#state)
-            );
-            if (transition)
+            const transitions = this.scheme[<S['type']> this.state.type];
+            if (transitions)
             {
-                // Update state
-                if (transition.update)
-                    this.#state = Object.assign(this.#state, transition.update(this.#state, event), { type: transition.to });
-                else
-                    this.#state = Object.assign(this.#state, { type: transition.to });
-
-                // Emit update
-                this.#emitter.emit(this.#state);
+                const transition = transitions.find((transition: Transition<S>) =>
+                    transition.if(event, this.state)
+                );
+                if (transition)
+                {                                        
+                    this.state = Object.assign(this.state,
+                        transition.update && transition.update(this.state, event),
+                        { type: transition.to || this.state.type }
+                    ); 
+                    // Emit update
+                    this.emitter.emit(this.state);
+                }
             }
         }
+        else        
+            this.emitter.events.forEach(this.emitter.offAll);        
     }
 
-    on = this.#emitter.on;
+    on = this.emitter.on;
 
-    off = this.#emitter.off;
-
-    offAll = this.#emitter.offAll;
+    off = this.emitter.off;
 }
 
 export default FSM;
