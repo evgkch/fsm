@@ -1,62 +1,64 @@
-import Emitter, { IEvent, IReceiver } from '/@lib/emitterjs';
+import Emitter, { IEvent, IReceiver, Listener } from '/@lib/emitterjs';
 
-export interface IState extends IEvent {};
+export type Pointer = number;
 
 interface IDispatcher {
     dispatch(event: IEvent): any;
 }
 
-export type Transition<S extends IState> = {
-    to: S['type'];
-    if: (event: IEvent, state: Omit<S, 'type'>) => boolean;
-    update?: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;    
-} | {
-    to?: S['type'];
-    if: (event: IEvent, state: Omit<S, 'type'>) => boolean;
-    update: (state: Omit<S, 'type'>, event: IEvent) => Partial<Omit<S, 'type'>>;    
+export type Transition<P extends Pointer, E extends IEvent, S> = {
+    to?: P;
+    if: (event: IEvent, state: S) => boolean;
+    update?: (event: IEvent, state: S) => any;    
 };
 
-export type Scheme<S extends IState> = {
-    [key in S['type']]?: Transition<S>[];
+export type Scheme<P extends Pointer, E extends IEvent, S> = {
+    [key in P]?: Transition<P, E, S>[];
 };
 
-export interface IFSM<S extends IState> extends IDispatcher, IReceiver<S> {    
-    readonly scheme: Scheme<S>;       
+export class TransitionEvent<P extends Pointer, S> implements IEvent {    
+    constructor(public readonly type: P, public readonly state: S) {}
+}
+
+export interface IFSM<P extends Pointer, E extends IEvent, S> extends IDispatcher, IReceiver<TransitionEvent<P ,S>> {    
+    readonly scheme: Scheme<P, E, S>;       
     readonly isActive: boolean; 
 }
 
-class FSM<S extends IState> implements IFSM<S> {    
+class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {    
 
-    private emitter: Emitter<S> = new Emitter;
+    private emitter: Emitter<TransitionEvent<P, S>> = new Emitter;
     private state: S;
-    scheme: Scheme<S>;    
+    private pointer: P;
+    scheme: Scheme<P, E, S>;    
 
-    constructor(scheme: Scheme<S>, initialState: S) { 
-        this.scheme = scheme;      
-        this.state = initialState;
+    constructor(scheme: Scheme<P, E, S>, state: S, initialPointer: P) { 
+        this.scheme = scheme;           
+        this.state = state;
+        this.pointer = initialPointer;
     }
 
     get isActive(): boolean {
-        return this.state.type in this.scheme;
+        return this.pointer in this.scheme;
     }
 
-    dispatch(event: IEvent): void {
+    dispatch(event: E): void {
         if (this.isActive)
         {
-            const transitions = this.scheme[<S['type']> this.state.type];
+            const transitions = this.scheme[this.pointer];
             if (transitions)
             {
-                const transition = transitions.find((transition: Transition<S>) =>
+                const transition = transitions.find((transition: Transition<P, E, S>) =>
                     transition.if(event, this.state)
                 );
                 if (transition)
-                {                                        
-                    this.state = Object.assign(this.state,
-                        transition.update && transition.update(this.state, event),
-                        { type: transition.to || this.state.type }
-                    ); 
+                {
+                    if (transition.to)
+                        this.pointer = transition.to;
+                    if (transition.update)
+                        transition.update(event, this.state);
                     // Emit update
-                    this.emitter.emit(this.state);
+                    this.emitter.emit(new TransitionEvent(this.pointer, this.state));
                 }
             }
         }
@@ -64,9 +66,13 @@ class FSM<S extends IState> implements IFSM<S> {
             this.emitter.events.forEach(this.emitter.offAll.bind(this.emitter));        
     }
 
-    on = this.emitter.on.bind(this.emitter);
+    on<K extends TransitionEvent<P, S>>(pointer: K['type'], listener: Listener<K>) {
+        return this.emitter.on(pointer, listener);
+    }
 
-    off = this.emitter.off.bind(this.emitter);
+    off<K extends TransitionEvent<P, S>>(pointer: K['type'], listener: Listener<K>) {
+        return this.emitter.off(pointer, listener);
+    }
 }
 
 export default FSM;
