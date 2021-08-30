@@ -30,12 +30,12 @@ class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {
     private emitter: Emitter<TransitionEvent<P, S>> = new Emitter;
     private state: S;
     private pointer: P;
-    scheme: Scheme<P, E, S>;    
+    scheme: Scheme<P, E, S>;
 
-    constructor(scheme: Scheme<P, E, S>, state: S, initialPointer: P) { 
+    constructor(scheme: Scheme<P, E, S>, initialPointer: P, state: S) { 
         this.scheme = scheme;           
-        this.state = state;
         this.pointer = initialPointer;
+        this.state = state;        
     }
 
     get isActive(): boolean {

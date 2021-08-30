@@ -1,22 +1,22 @@
-import { IState, IFSM } from "./index";
+import { IFSM, TransitionEvent } from "./index";
 
 export class Logger {
 
-    stateTypes: Set<IState['type']> = new Set;
+    pointers: Set<any> = new Set;
 
-    constructor(private fsm: IFSM<any>, private log: (state: IState) => void) {        
-        for (let stateType in this.fsm.scheme)
+    constructor(private fsm: IFSM<any, any, any>, private log: (evt: TransitionEvent<any ,any>) => void) {        
+        for (let pointer in this.fsm.scheme)
         {
-            this.stateTypes.add(stateType);
-            this.fsm.scheme[stateType]?.forEach(t => {
-                if (t.to) this.stateTypes.add(t.to);
+            this.pointers.add(pointer);
+            this.fsm.scheme[pointer]?.forEach(t => {
+                if (t.to) this.pointers.add(t.to);
             })
         }
-        this.stateTypes.forEach(stateType => this.fsm.on(stateType, this.log.bind(this)));
+        this.pointers.forEach(pointer => this.fsm.on(pointer, this.log.bind(this)));
     }
 
     terminate() {
-        this.stateTypes.forEach(stateType => this.fsm.off(stateType, this.log.bind(this)));
+        this.pointers.forEach(pointer => this.fsm.off(pointer, this.log.bind(this)));
     }
 
 }
