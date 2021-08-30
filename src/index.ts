@@ -1,6 +1,6 @@
 import Emitter, { IEvent, IReceiver, Listener } from '/@lib/emitterjs';
 
-export type Pointer = number;
+export type Pointer = number | string | symbol;
 
 interface IDispatcher {
     dispatch(event: IEvent): any;
@@ -8,8 +8,8 @@ interface IDispatcher {
 
 export type Transition<P extends Pointer, E extends IEvent, S> = {
     to?: P;
-    if: (event: IEvent, state: S) => boolean;
-    update?: (event: IEvent, state: S) => any;    
+    if: (event: E, state: S) => boolean;
+    update?: (event: E, state: S) => any;    
 };
 
 export type Scheme<P extends Pointer, E extends IEvent, S> = {
