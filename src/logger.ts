@@ -1,4 +1,4 @@
-import { IFSM, TransitionEvent } from "./index";
+import { IFSM, TransitionEvent } from "/index.js";
 
 export class Logger {
 
