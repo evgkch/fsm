@@ -4,10 +4,9 @@
   "description": "JavaScript Finite State Machine",
   "main": "dist/index.js",
   "browser": "dist/index.js",
-  "scripts": {
-    "postinstall": "mkdir -p dist/@lib/emitterjs && cp node_modules/@lib/emitterjs/dist/index.d.ts dist/@lib/emitterjs && tsc",
+  "scripts": {    
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "./scripts/build.sh",
     "compile": "web-crack",
     "dev": "tsc --watch"
   },
