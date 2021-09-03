@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "browser": "dist/index.js",
   "scripts": {
+    "postinstall": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "compile": "web-crack",
