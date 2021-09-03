@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "browser": "dist/index.js",
   "scripts": {
-    "postinstall": "tsc",
+    "postinstall": "mkdir -p dist/@lib/emitterjs && cp node_modules/@lib/emitterjs/dist/index.d.ts dist/@lib/emitterjs && tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "compile": "web-crack",
