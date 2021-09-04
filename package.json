@@ -4,10 +4,10 @@
   "description": "JavaScript Finite State Machine",
   "main": "dist/index.js",
   "browser": "dist/index.js",
-  "scripts": {
-    "postinstall": "tsc",
+  "types": "dist/index.d.ts",
+  "scripts": {    
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./scripts/build.sh",
+    "build": "tsc",
     "dev": "tsc --watch"
   },
   "dependencies": {

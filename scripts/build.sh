@@ -1,2 +1,0 @@
-tsc
-web-crack
