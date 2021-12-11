@@ -1,33 +1,45 @@
-import Emitter, { IEvent, IReceiver, Listener } from '/@lib/emitterjs';
+import Emitter, { Signal, IReceiver } from '/@lib/signaljs';
 
 export type Pointer = number | string | symbol;
 
-interface IDispatcher {
-    dispatch(event: IEvent): any;
+export interface IEvent {
+    type: Signal
+}
+
+export interface IDispatcher<E extends IEvent> {
+    dispatch(event: E): this;
+}
+
+export interface IAsyncDispatcher<E extends IEvent> {
+    dispatchAsync(event: E): Promise<this>;
 }
 
 export type Transition<P extends Pointer, E extends IEvent, S> = {
-    to?: P;
+    to: P;
     if: (event: E, state: S) => boolean;
-    update?: (event: E, state: S) => any;    
+    update?: (event: E, state: S) => void;    
 };
 
 export type Scheme<P extends Pointer, E extends IEvent, S> = {
-    [key in P]?: Transition<P, E, S>[];
+    [p in P]?: Transition<P, E, S>[];
 };
+
+export type SignalStateMap<P extends Pointer, S> = {
+    [p in P]: [state: S]
+}
 
 export class TransitionEvent<P extends Pointer, S> implements IEvent {    
     constructor(public readonly type: P, public readonly state: S) {}
 }
 
-export interface IFSM<P extends Pointer, E extends IEvent, S> extends IDispatcher, IReceiver<TransitionEvent<P ,S>> {    
+export interface IFSM<P extends Pointer, E extends IEvent, S> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<SignalStateMap<P, S>> {    
     readonly scheme: Scheme<P, E, S>;       
     readonly isActive: boolean; 
 }
 
 class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {    
 
-    private emitter: Emitter<TransitionEvent<P, S>> = new Emitter;
+    private emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
     private state: S;
     private pointer: P;
     scheme: Scheme<P, E, S>;
@@ -42,7 +54,7 @@ class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {
         return this.pointer in this.scheme;
     }
 
-    dispatch(event: E): void {
+    dispatch(event: E): this {
         if (this.isActive)
         {
             const transitions = this.scheme[this.pointer];
@@ -58,20 +70,34 @@ class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {
                     if (transition.update)
                         transition.update(event, this.state);
                     // Emit update
-                    this.emitter.emit(new TransitionEvent(this.pointer, this.state));
+                    this.emitter.emit(this.pointer, this.state);
                 }
             }
         }
         else        
-            this.emitter.events.forEach(this.emitter.offAll.bind(this.emitter));        
+            this.emitter.signals.forEach(this.emitter.offAll.bind(this.emitter));
+        return this;
     }
 
-    on<K extends TransitionEvent<P, S>>(pointer: K['type'], listener: Listener<K>) {
-        return this.emitter.on(pointer, listener);
+    dispatchAsync(event: E): Promise<this> {
+        return new Promise(resolve =>
+            setTimeout(() => resolve(this.dispatch(event)), 0)
+        ); 
     }
 
-    off<K extends TransitionEvent<P, S>>(pointer: K['type'], listener: Listener<K>) {
-        return this.emitter.off(pointer, listener);
+    on<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
+        this.emitter.on(state, listener);
+        return this;
+    }
+
+    once<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
+        this.emitter.once(state, listener);
+        return this;
+    }
+
+    off<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
+        this.emitter.off(state, listener);
+        return this;
     }
 }
 

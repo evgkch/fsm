@@ -1,4 +1,4 @@
-import Emitter from '/@lib/emitterjs';
+import Emitter from '/@lib/signaljs';
 export class TransitionEvent {
     constructor(type, state) {
         this.type = type;
@@ -26,18 +26,28 @@ class FSM {
                     if (transition.update)
                         transition.update(event, this.state);
                     // Emit update
-                    this.emitter.emit(new TransitionEvent(this.pointer, this.state));
+                    this.emitter.emit(this.pointer, this.state);
                 }
             }
         }
         else
-            this.emitter.events.forEach(this.emitter.offAll.bind(this.emitter));
+            this.emitter.signals.forEach(this.emitter.offAll.bind(this.emitter));
+        return this;
     }
-    on(pointer, listener) {
-        return this.emitter.on(pointer, listener);
+    dispatchAsync(event) {
+        return new Promise(resolve => setTimeout(() => resolve(this.dispatch(event)), 0));
     }
-    off(pointer, listener) {
-        return this.emitter.off(pointer, listener);
+    on(state, listener) {
+        this.emitter.on(state, listener);
+        return this;
+    }
+    once(state, listener) {
+        this.emitter.once(state, listener);
+        return this;
+    }
+    off(state, listener) {
+        this.emitter.off(state, listener);
+        return this;
     }
 }
 export default FSM;
