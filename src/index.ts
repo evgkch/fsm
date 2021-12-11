@@ -33,7 +33,7 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
     readonly isActive: boolean; 
 }
 
-class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, S, E> {    
+class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {    
 
     private emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
     private state: S;

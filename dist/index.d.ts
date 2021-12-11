@@ -24,7 +24,7 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
     readonly scheme: Scheme<P, S, E>;
     readonly isActive: boolean;
 }
-declare class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, S, E> {
+declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
     private emitter;
     private state;
     private pointer;
