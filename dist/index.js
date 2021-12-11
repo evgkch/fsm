@@ -1,10 +1,4 @@
 import Emitter from '/@lib/signaljs';
-export class TransitionEvent {
-    constructor(type, state) {
-        this.type = type;
-        this.state = state;
-    }
-}
 class FSM {
     constructor(scheme, initialPointer, state) {
         this.emitter = new Emitter;
@@ -19,7 +13,7 @@ class FSM {
         if (this.isActive) {
             const transitions = this.scheme[this.pointer];
             if (transitions) {
-                const transition = transitions.find((transition) => transition.if(event, this.state));
+                const transition = transitions.find(transition => transition.if(event, this.state));
                 if (transition) {
                     if (transition.to)
                         this.pointer = transition.to;

@@ -14,37 +14,33 @@ export interface IAsyncDispatcher<E extends IEvent> {
     dispatchAsync(event: E): Promise<this>;
 }
 
-export type Transition<P extends Pointer, E extends IEvent, S> = {
+export type Transition<P extends Pointer, S = undefined, E extends IEvent = IEvent> = {
     to: P;
     if: (event: E, state: S) => boolean;
     update?: (event: E, state: S) => void;    
 };
 
-export type Scheme<P extends Pointer, E extends IEvent, S> = {
-    [p in P]?: Transition<P, E, S>[];
+export type Scheme<P extends Pointer, S = undefined, E extends IEvent = IEvent> = {
+    [p in P]?: Transition<P, S, E>[];
 };
 
-export type SignalStateMap<P extends Pointer, S> = {
+export type SignalStateMap<P extends Pointer, S = undefined> = {
     [p in P]: [state: S]
 }
 
-export class TransitionEvent<P extends Pointer, S> implements IEvent {    
-    constructor(public readonly type: P, public readonly state: S) {}
-}
-
-export interface IFSM<P extends Pointer, E extends IEvent, S> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<SignalStateMap<P, S>> {    
-    readonly scheme: Scheme<P, E, S>;       
+export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<SignalStateMap<P, S>> {    
+    readonly scheme: Scheme<P, S, E>;       
     readonly isActive: boolean; 
 }
 
-class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {    
+class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, S, E> {    
 
     private emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
     private state: S;
     private pointer: P;
-    scheme: Scheme<P, E, S>;
+    scheme: Scheme<P, S, E>;
 
-    constructor(scheme: Scheme<P, E, S>, initialPointer: P, state: S) { 
+    constructor(scheme: Scheme<P, S, E>, initialPointer: P, state: S) { 
         this.scheme = scheme;           
         this.pointer = initialPointer;
         this.state = state;        
@@ -60,7 +56,7 @@ class FSM<P extends Pointer, E extends IEvent, S> implements IFSM<P, E, S> {
             const transitions = this.scheme[this.pointer];
             if (transitions)
             {
-                const transition = transitions.find((transition: Transition<P, E, S>) =>
+                const transition = transitions.find(transition =>
                     transition.if(event, this.state)
                 );
                 if (transition)
