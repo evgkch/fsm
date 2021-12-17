@@ -1,4 +1,4 @@
-import { Signal, IReceiver } from '/@lib/signaljs';
+import Emitter, { Signal, IReceiver } from '/@lib/signaljs';
 export declare type Pointer = number | string | symbol;
 export interface IEvent {
     type: Signal;
@@ -25,9 +25,9 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
     readonly isActive: boolean;
 }
 declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
-    private emitter;
-    private state;
-    private pointer;
+    protected emitter: Emitter<SignalStateMap<P, S>>;
+    protected state: S;
+    protected pointer: P;
     scheme: Scheme<P, S, E>;
     constructor(scheme: Scheme<P, S, E>, initialPointer: P, state: S);
     get isActive(): boolean;

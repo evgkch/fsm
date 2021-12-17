@@ -35,9 +35,9 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
 
 class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {    
 
-    private emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
-    private state: S;
-    private pointer: P;
+    protected emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
+    protected state: S;
+    protected pointer: P;
     scheme: Scheme<P, S, E>;
 
     constructor(scheme: Scheme<P, S, E>, initialPointer: P, state: S) { 
