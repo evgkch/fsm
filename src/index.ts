@@ -7,11 +7,11 @@ export interface IEvent {
 }
 
 export interface IDispatcher<E extends IEvent> {
-    dispatch(event: E): this;
+    dispatch(event: E): boolean;
 }
 
 export interface IAsyncDispatcher<E extends IEvent> {
-    dispatchAsync(event: E): Promise<this>;
+    dispatchAsync(event: E): Promise<boolean>;
 }
 
 export type Transition<P extends Pointer, S = undefined, E extends IEvent = IEvent> = {
@@ -24,75 +24,87 @@ export type Scheme<P extends Pointer, S = undefined, E extends IEvent = IEvent> 
     [p in P]?: Transition<P, S, E>[];
 };
 
-export type SignalStateMap<P extends Pointer, S = undefined> = {
+export type StateSignalMap<P extends Pointer, S = undefined> = {
     [p in P]: [state: S]
 }
 
-export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<SignalStateMap<P, S>> {    
-    readonly scheme: Scheme<P, S, E>;       
-    readonly isActive: boolean; 
+export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<StateSignalMap<P, S>> {               
+    readonly isActive: boolean;
+    readonly pointer: P;
+    maxListeners: number;
 }
 
-class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {    
-
-    protected emitter: Emitter<SignalStateMap<P, S>> = new Emitter;
-    protected state: S;
-    protected pointer: P;
-    scheme: Scheme<P, S, E>;
+class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
+     
+    #emitter: Emitter<StateSignalMap<P, S>> = new Emitter;
+    #state: S;
+    #pointer: P;
+    #scheme: Scheme<P, S, E>;
 
     constructor(scheme: Scheme<P, S, E>, initialPointer: P, state: S) { 
-        this.scheme = scheme;           
-        this.pointer = initialPointer;
-        this.state = state;        
+        this.#scheme = scheme;           
+        this.#pointer = initialPointer;
+        this.#state = state;        
     }
+
+    get pointer() {
+        return this.#pointer;
+    };
 
     get isActive(): boolean {
-        return this.pointer in this.scheme;
+        return this.#pointer in this.#scheme;
     }
 
-    dispatch(event: E): this {
+    set maxListeners(n: number) {
+        this.#emitter.maxListeners = n;
+    }
+
+    get maxListeners() {
+        return this.#emitter.maxListeners;
+    }
+
+    dispatch(event: E): boolean {
         if (this.isActive)
         {
-            const transitions = this.scheme[this.pointer];
+            const transitions = this.#scheme[this.#pointer];
             if (transitions)
             {
                 const transition = transitions.find(transition =>
-                    transition.if(event, this.state)
+                    transition.if(event, this.#state)
                 );
                 if (transition)
-                {
-                    if (transition.to)
-                        this.pointer = transition.to;
+                {                    
+                    this.#pointer = transition.to;
                     if (transition.update)
-                        transition.update(event, this.state);
+                        transition.update(event, this.#state);
                     // Emit update
-                    this.emitter.emit(this.pointer, this.state);
+                    this.#emitter.emit(this.pointer, this.#state);
+                    return true;
                 }
             }
-        }
-        else        
-            this.emitter.signals.forEach(this.emitter.offAll.bind(this.emitter));
-        return this;
+        }      
+        this.#emitter.offGlobal();
+        return false;
     }
 
-    dispatchAsync(event: E): Promise<this> {
+    dispatchAsync(event: E): Promise<boolean> {
         return new Promise(resolve =>
             setTimeout(() => resolve(this.dispatch(event)), 0)
         ); 
     }
 
-    on<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
-        this.emitter.on(state, listener);
+    on<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any) {
+        this.#emitter.on(pointer, listener);
         return this;
     }
 
-    once<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
-        this.emitter.once(state, listener);
+    once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any) {
+        this.#emitter.once(pointer, listener);
         return this;
     }
 
-    off<K extends P>(state: K, listener: (...args: SignalStateMap<K, S>[K]) => any) {
-        this.emitter.off(state, listener);
+    off<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any) {
+        this.#emitter.off(pointer, listener);
         return this;
     }
 }
