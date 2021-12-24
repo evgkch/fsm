@@ -49,7 +49,8 @@ class FSM {
                 }
             }
         }
-        __classPrivateFieldGet(this, _FSM_emitter, "f").offGlobal();
+        else
+            __classPrivateFieldGet(this, _FSM_emitter, "f").offGlobal();
         return false;
     }
     dispatchAsync(event) {

@@ -83,7 +83,9 @@ class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implement
                 }
             }
         }      
-        this.#emitter.offGlobal();
+        else
+            this.#emitter.offGlobal();
+        
         return false;
     }
 
