@@ -1,4 +1,4 @@
-import { Signal, IReceiver } from '/@lib/signaljs';
+import { Signal, IReceiver } from '/@signaljs';
 export declare type Pointer = number | string | symbol;
 export interface IEvent {
     type: Signal;

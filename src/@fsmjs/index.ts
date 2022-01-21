@@ -1,4 +1,4 @@
-import Emitter, { Signal, IReceiver } from '/@lib/signaljs';
+import Emitter, { Signal, IReceiver } from '/@signaljs';
 
 export type Pointer = number | string | symbol;
 
