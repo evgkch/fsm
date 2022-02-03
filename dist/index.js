@@ -10,7 +10,7 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _FSM_emitter, _FSM_state, _FSM_pointer, _FSM_scheme;
-import Emitter from '/@signaljs';
+import Emitter from '/@lib/signaljs';
 class FSM {
     constructor(scheme, initialPointer, state) {
         _FSM_emitter.set(this, new Emitter);
@@ -24,9 +24,7 @@ class FSM {
     get pointer() {
         return __classPrivateFieldGet(this, _FSM_pointer, "f");
     }
-    get state() {
-        return __classPrivateFieldGet(this, _FSM_state, "f");
-    }
+    ;
     get isActive() {
         return __classPrivateFieldGet(this, _FSM_pointer, "f") in __classPrivateFieldGet(this, _FSM_scheme, "f");
     }

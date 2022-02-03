@@ -31,6 +31,7 @@ export type StateSignalMap<P extends Pointer, S = undefined> = {
 export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<StateSignalMap<P, S>> {               
     readonly isActive: boolean;
     readonly pointer: P;
+    readonly state: S;
     maxListeners: number;
 }
 
@@ -49,7 +50,11 @@ class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implement
 
     get pointer() {
         return this.#pointer;
-    };
+    }
+
+    get state() {
+        return this.#state;
+    }
 
     get isActive(): boolean {
         return this.#pointer in this.#scheme;

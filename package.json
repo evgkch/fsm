@@ -1,6 +1,6 @@
 {
   "name": "fsmjs",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "JavaScript Finite State Machine",
   "main": "dist/@fsmjs/index.js",
   "browser": "dist/@fsmjs/index.js",

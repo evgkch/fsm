@@ -1,4 +1,4 @@
-import { Signal, IReceiver } from '/@signaljs';
+import { Signal, IReceiver } from '/@lib/signaljs';
 export declare type Pointer = number | string | symbol;
 export interface IEvent {
     type: Signal;
@@ -23,14 +23,12 @@ export declare type StateSignalMap<P extends Pointer, S = undefined> = {
 export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<StateSignalMap<P, S>> {
     readonly isActive: boolean;
     readonly pointer: P;
-    readonly state: S;
     maxListeners: number;
 }
 declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
     #private;
     constructor(scheme: Scheme<P, S, E>, initialPointer: P, state: S);
     get pointer(): P;
-    get state(): S;
     get isActive(): boolean;
     set maxListeners(n: number);
     get maxListeners(): number;
