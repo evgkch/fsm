@@ -1,21 +1,19 @@
 {
   "name": "fsmjs",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "JavaScript Finite State Machine",
   "main": "dist/index.js",
   "browser": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "compile": "web-crack",
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@lib/emitterjs": "evgkch/emitterjs#v1.0.0"
+    "emitterjs": "evgkch/emitterjs"
   },
   "devDependencies": {
-    "typescript": "~4.3.5",
-    "web-crack": "evgkch/web-crack#v1.0.0"
+    "typescript": "~4.3.5"
   },
   "repository": {
     "type": "git",
