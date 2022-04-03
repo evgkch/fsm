@@ -32,7 +32,6 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
     readonly isActive: boolean;
     readonly pointer: P;
     readonly state: S;
-    maxListeners: number;
 }
 
 class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
@@ -58,14 +57,6 @@ class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implement
 
     get isActive(): boolean {
         return this.#pointer in this.#scheme;
-    }
-
-    set maxListeners(n: number) {
-        this.#emitter.maxListeners = n;
-    }
-
-    get maxListeners() {
-        return this.#emitter.maxListeners;
     }
 
     dispatch(event: E): boolean {
@@ -107,6 +98,11 @@ class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implement
 
     once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any) {
         this.#emitter.once(pointer, listener);
+        return this;
+    }
+
+    onweak<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any) {
+        this.#emitter.onweak(pointer, listener);
         return this;
     }
 

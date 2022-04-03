@@ -30,12 +30,6 @@ class FSM {
     get isActive() {
         return __classPrivateFieldGet(this, _FSM_pointer, "f") in __classPrivateFieldGet(this, _FSM_scheme, "f");
     }
-    set maxListeners(n) {
-        __classPrivateFieldGet(this, _FSM_emitter, "f").maxListeners = n;
-    }
-    get maxListeners() {
-        return __classPrivateFieldGet(this, _FSM_emitter, "f").maxListeners;
-    }
     dispatch(event) {
         if (this.isActive) {
             const transitions = __classPrivateFieldGet(this, _FSM_scheme, "f")[__classPrivateFieldGet(this, _FSM_pointer, "f")];
@@ -64,6 +58,10 @@ class FSM {
     }
     once(pointer, listener) {
         __classPrivateFieldGet(this, _FSM_emitter, "f").once(pointer, listener);
+        return this;
+    }
+    onweak(pointer, listener) {
+        __classPrivateFieldGet(this, _FSM_emitter, "f").onweak(pointer, listener);
         return this;
     }
     off(pointer, listener) {

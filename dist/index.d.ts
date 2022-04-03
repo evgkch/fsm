@@ -24,7 +24,6 @@ export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEven
     readonly isActive: boolean;
     readonly pointer: P;
     readonly state: S;
-    maxListeners: number;
 }
 declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implements IFSM<P, S, E> {
     #private;
@@ -32,12 +31,11 @@ declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> i
     get pointer(): P;
     get state(): S;
     get isActive(): boolean;
-    set maxListeners(n: number);
-    get maxListeners(): number;
     dispatch(event: E): boolean;
     dispatchAsync(event: E): Promise<boolean>;
     on<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
     once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
+    onweak<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
     off<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
 }
 export default FSM;
