@@ -40,7 +40,7 @@ class FSM {
                     if (transition.update)
                         transition.update(event, __classPrivateFieldGet(this, _FSM_state, "f"));
                     // Emit update
-                    __classPrivateFieldGet(this, _FSM_emitter, "f").emit(this.pointer, __classPrivateFieldGet(this, _FSM_state, "f"));
+                    __classPrivateFieldGet(this, _FSM_emitter, "f").emit(this.pointer, event, __classPrivateFieldGet(this, _FSM_state, "f"));
                     return true;
                 }
             }

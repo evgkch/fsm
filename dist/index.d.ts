@@ -17,10 +17,10 @@ export declare type Transition<P extends Pointer, S = undefined, E extends IEven
 export declare type Scheme<P extends Pointer, S = undefined, E extends IEvent = IEvent> = {
     [p in P]?: Transition<P, S, E>[];
 };
-export declare type StateSignalMap<P extends Pointer, S = undefined> = {
-    [p in P]: [state: S];
+export declare type StateSignalMap<P extends Pointer, S = undefined, E extends IEvent = IEvent> = {
+    [p in P]: [event: E, state: S];
 };
-export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<StateSignalMap<P, S>> {
+export interface IFSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> extends IDispatcher<E>, IAsyncDispatcher<E>, IReceiver<StateSignalMap<P, S, E>> {
     readonly isActive: boolean;
     readonly pointer: P;
     readonly state: S;
@@ -33,9 +33,9 @@ declare class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> i
     get isActive(): boolean;
     dispatch(event: E): boolean;
     dispatchAsync(event: E): Promise<boolean>;
-    on<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
-    once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
-    onweak<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
-    off<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S>[K]) => any): this;
+    on<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any): this;
+    once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any): this;
+    onweak<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any): this;
+    off<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any): this;
 }
 export default FSM;
