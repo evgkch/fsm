@@ -53,15 +53,18 @@ class FSM {
         return new Promise(resolve => setTimeout(() => resolve(this.dispatch(event)), 0));
     }
     on(pointer, listener) {
-        __classPrivateFieldGet(this, _FSM_emitter, "f").on(pointer, listener);
+        if (this.isActive)
+            __classPrivateFieldGet(this, _FSM_emitter, "f").on(pointer, listener);
         return this;
     }
     once(pointer, listener) {
-        __classPrivateFieldGet(this, _FSM_emitter, "f").once(pointer, listener);
+        if (this.isActive)
+            __classPrivateFieldGet(this, _FSM_emitter, "f").once(pointer, listener);
         return this;
     }
     onweak(pointer, listener) {
-        __classPrivateFieldGet(this, _FSM_emitter, "f").onweak(pointer, listener);
+        if (this.isActive)
+            __classPrivateFieldGet(this, _FSM_emitter, "f").onweak(pointer, listener);
         return this;
     }
     off(pointer, listener) {

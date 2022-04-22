@@ -92,17 +92,17 @@ class FSM<P extends Pointer, S = undefined, E extends IEvent = IEvent> implement
     }
 
     on<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any) {
-        this.#emitter.on(pointer, listener);
+        if (this.isActive) this.#emitter.on(pointer, listener);
         return this;
     }
 
     once<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any) {
-        this.#emitter.once(pointer, listener);
+        if (this.isActive) this.#emitter.once(pointer, listener);
         return this;
     }
 
     onweak<K extends P>(pointer: K, listener: (...args: StateSignalMap<K, S, E>[K]) => any) {
-        this.#emitter.onweak(pointer, listener);
+        if (this.isActive) this.#emitter.onweak(pointer, listener);
         return this;
     }
 
