@@ -82,7 +82,7 @@ rx.on(WaterAggregation.Gas, (_, state) => { console.log(`water is gas; t = ${sta
 dx.dispatch(new Heat(20));
 
 // Before t was 20. Next t is 100. The third listener works
-dx.dispatch(new Heat(20));
+dx.dispatch(new Heat(80));
 
 // Before t was 80. Next t is ... Ops! We had no transitions!. Listeners are silent
 dx.dispatch(new Heat(-200));

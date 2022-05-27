@@ -1,9 +1,9 @@
 import { Tx, Rx, Message } from '/channeljs';
 
-export type Pointer = number | string | symbol;
+export type Pointer = Message;
 
 export interface IEvent {
-    type: Message
+    type: Pointer
 }
 
 export type Transition<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> = {
