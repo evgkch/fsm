@@ -9,68 +9,65 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _FSM_emitter, _FSM_state, _FSM_pointer, _FSM_scheme;
-import Emitter from '/emitterjs';
-class FSM {
-    constructor(scheme, initialPointer, state) {
-        _FSM_emitter.set(this, new Emitter);
-        _FSM_state.set(this, void 0);
-        _FSM_pointer.set(this, void 0);
-        _FSM_scheme.set(this, void 0);
-        __classPrivateFieldSet(this, _FSM_scheme, scheme, "f");
-        __classPrivateFieldSet(this, _FSM_pointer, initialPointer, "f");
-        __classPrivateFieldSet(this, _FSM_state, state, "f");
+var _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx, _FSM_subscribers, _FSM_tx;
+import { Tx, Rx } from '/channeljs';
+export class Dx {
+    constructor(scheme, pointer, state, tx) {
+        _Dx_pointer.set(this, void 0);
+        _Dx_state.set(this, void 0);
+        _Dx_scheme.set(this, void 0);
+        _Dx_tx.set(this, void 0);
+        __classPrivateFieldSet(this, _Dx_scheme, scheme, "f");
+        __classPrivateFieldSet(this, _Dx_pointer, pointer, "f");
+        __classPrivateFieldSet(this, _Dx_state, state, "f");
+        __classPrivateFieldSet(this, _Dx_tx, tx, "f");
     }
     get pointer() {
-        return __classPrivateFieldGet(this, _FSM_pointer, "f");
+        return __classPrivateFieldGet(this, _Dx_pointer, "f");
     }
-    get state() {
-        return __classPrivateFieldGet(this, _FSM_state, "f");
-    }
-    get isActive() {
-        return __classPrivateFieldGet(this, _FSM_pointer, "f") in __classPrivateFieldGet(this, _FSM_scheme, "f");
+    get active() {
+        return __classPrivateFieldGet(this, _Dx_pointer, "f") in __classPrivateFieldGet(this, _Dx_scheme, "f");
     }
     dispatch(event) {
-        if (this.isActive) {
-            const transitions = __classPrivateFieldGet(this, _FSM_scheme, "f")[__classPrivateFieldGet(this, _FSM_pointer, "f")];
-            if (transitions) {
-                const transition = transitions.find(transition => transition.if(event, __classPrivateFieldGet(this, _FSM_state, "f")));
-                if (transition) {
-                    __classPrivateFieldSet(this, _FSM_pointer, transition.to, "f");
-                    if (transition.update)
-                        transition.update(event, __classPrivateFieldGet(this, _FSM_state, "f"));
-                    // Emit update
-                    __classPrivateFieldGet(this, _FSM_emitter, "f").emit(this.pointer, event, __classPrivateFieldGet(this, _FSM_state, "f"));
+        if (this.active) {
+            const ts = __classPrivateFieldGet(this, _Dx_scheme, "f")[__classPrivateFieldGet(this, _Dx_pointer, "f")];
+            if (ts) {
+                const t = ts.find(t => t.if(event, __classPrivateFieldGet(this, _Dx_state, "f")));
+                if (t) {
+                    __classPrivateFieldSet(this, _Dx_pointer, t.to, "f");
+                    if (t.update) {
+                        t.update(event, __classPrivateFieldGet(this, _Dx_state, "f"));
+                    }
+                    __classPrivateFieldGet(this, _Dx_tx, "f").send(this.pointer, event, __classPrivateFieldGet(this, _Dx_state, "f"));
                     return true;
                 }
             }
         }
-        else
-            __classPrivateFieldGet(this, _FSM_emitter, "f").offGlobal();
         return false;
     }
-    dispatchAsync(event) {
+    dispatch_async(event) {
         return new Promise(resolve => setTimeout(() => resolve(this.dispatch(event)), 0));
     }
-    on(pointer, listener) {
-        if (this.isActive)
-            __classPrivateFieldGet(this, _FSM_emitter, "f").on(pointer, listener);
-        return this;
+}
+_Dx_pointer = new WeakMap(), _Dx_state = new WeakMap(), _Dx_scheme = new WeakMap(), _Dx_tx = new WeakMap();
+export default class FSM {
+    constructor(scheme, pointer, state) {
+        _FSM_subscribers.set(this, new Map);
+        _FSM_tx.set(this, new Tx(__classPrivateFieldGet(this, _FSM_subscribers, "f")));
+        this.rx = new Rx(__classPrivateFieldGet(this, _FSM_subscribers, "f"));
+        this.dx = new Dx(scheme, pointer, state, __classPrivateFieldGet(this, _FSM_tx, "f"));
     }
-    once(pointer, listener) {
-        if (this.isActive)
-            __classPrivateFieldGet(this, _FSM_emitter, "f").once(pointer, listener);
-        return this;
+    /**
+     * Getting all subscribtion pointers, that have at least one listener
+     */
+    get pointers() {
+        return __classPrivateFieldGet(this, _FSM_subscribers, "f").keys();
     }
-    onweak(pointer, listener) {
-        if (this.isActive)
-            __classPrivateFieldGet(this, _FSM_emitter, "f").onweak(pointer, listener);
-        return this;
-    }
-    off(pointer, listener) {
-        __classPrivateFieldGet(this, _FSM_emitter, "f").off(pointer, listener);
-        return this;
+    /**
+     * Clear all subsribers
+     */
+    clear() {
+        __classPrivateFieldGet(this, _FSM_subscribers, "f").clear();
     }
 }
-_FSM_emitter = new WeakMap(), _FSM_state = new WeakMap(), _FSM_pointer = new WeakMap(), _FSM_scheme = new WeakMap();
-export default FSM;
+_FSM_subscribers = new WeakMap(), _FSM_tx = new WeakMap();

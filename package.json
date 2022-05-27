@@ -1,16 +1,13 @@
 {
   "name": "fsmjs",
-  "version": "2.0.0",
-  "description": "JavaScript Finite State Machine",
+  "version": "3.0.0",
+  "description": "A lib to create a Finite State Machine",
   "main": "dist/index.js",
   "browser": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "dev": "tsc --watch"
-  },
-  "dependencies": {
-    "emitterjs": "evgkch/emitterjs"
   },
   "devDependencies": {
     "typescript": "~4.3.5"
@@ -25,5 +22,8 @@
   ],
   "author": "Evgeny Kucherenko",
   "license": "MIT",
-  "homepage": "https://github.com/evgkch/fsmjs"
+  "homepage": "https://github.com/evgkch/fsmjs",
+  "dependencies": {
+    "channeljs": "github:evgkch/channeljs"
+  }
 }
