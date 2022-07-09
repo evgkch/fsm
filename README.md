@@ -67,10 +67,7 @@ const scheme: Scheme<WaterAggregation, Heat, Water> = {
 const water: Water = { t: 0 };
 
 // Define FSM
-const fsm = new FSM<WaterAggregation, Heat, Water>(scheme, WaterAggregation.Liquid, water);
-
-// Use dispatcher and receiver
-const { dx, rx } = fsm;
+const { dx, rx } = fsm<WaterAggregation, Heat, Water>(scheme, WaterAggregation.Liquid, water);
 
 // Subscribe on pointer changes
 // See more 'https://github.com/evgkch/channeljs'

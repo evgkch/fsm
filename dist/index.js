@@ -9,8 +9,16 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx, _FSM_subscribers, _FSM_tx;
-import { Tx, Rx } from '/channeljs';
+var _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx;
+import { channel } from '/channeljs';
+export function fsm(scheme, pointer, state) {
+    const { tx, rx, ch } = channel();
+    return {
+        ch,
+        rx,
+        dx: new Dx(scheme, pointer, state, tx)
+    };
+}
 export class Dx {
     constructor(scheme, pointer, state, tx) {
         _Dx_pointer.set(this, void 0);
@@ -25,11 +33,11 @@ export class Dx {
     get pointer() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f");
     }
-    get active() {
+    get is_active() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f") in __classPrivateFieldGet(this, _Dx_scheme, "f");
     }
     dispatch(event) {
-        if (this.active) {
+        if (this.is_active) {
             const ts = __classPrivateFieldGet(this, _Dx_scheme, "f")[__classPrivateFieldGet(this, _Dx_pointer, "f")];
             if (ts) {
                 const t = ts.find(t => t.if(event, __classPrivateFieldGet(this, _Dx_state, "f")));
@@ -50,24 +58,3 @@ export class Dx {
     }
 }
 _Dx_pointer = new WeakMap(), _Dx_state = new WeakMap(), _Dx_scheme = new WeakMap(), _Dx_tx = new WeakMap();
-export default class FSM {
-    constructor(scheme, pointer, state) {
-        _FSM_subscribers.set(this, new Map);
-        _FSM_tx.set(this, new Tx(__classPrivateFieldGet(this, _FSM_subscribers, "f")));
-        this.rx = new Rx(__classPrivateFieldGet(this, _FSM_subscribers, "f"));
-        this.dx = new Dx(scheme, pointer, state, __classPrivateFieldGet(this, _FSM_tx, "f"));
-    }
-    /**
-     * Getting all subscribtion pointers, that have at least one listener
-     */
-    get pointers() {
-        return __classPrivateFieldGet(this, _FSM_subscribers, "f").keys();
-    }
-    /**
-     * Clear all subsribers
-     */
-    clear() {
-        __classPrivateFieldGet(this, _FSM_subscribers, "f").clear();
-    }
-}
-_FSM_subscribers = new WeakMap(), _FSM_tx = new WeakMap();
