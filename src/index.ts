@@ -1,4 +1,4 @@
-import { channel, Tx, Message } from '/channeljs';
+import { Rx, Tx, Message, Subscribers } from '/channeljs';
 
 export type Pointer = Message;
 
@@ -20,13 +20,24 @@ export type PointerMap<P extends Pointer, E extends IEvent = IEvent, S extends O
     [p in P]: [event: E, state: Readonly<S>]
 }
 
-export function fsm<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}>(scheme: Scheme<P, E, S>, pointer: P, state: S) {
-    const { tx, rx, ch } = channel<PointerMap<P, E, S>>();
-    return {
-        ch,
-        rx,
-        dx: new Dx<P, E, S>(scheme, pointer, state, tx)
-    };
+export default class FSM<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> {
+
+    #subscribers: Subscribers<PointerMap<P, E, S>> = new Map;
+    readonly dx: Dx<P, E, S>;
+    readonly rx: Rx<PointerMap<P, E, S>>;
+
+    constructor(scheme: Scheme<P, E, S>, pointer: P, state: S) {
+        this.dx = new Dx(scheme, pointer, state, this.#subscribers);
+        this.rx = new Rx(this.#subscribers);
+    }
+
+    /**
+     * Clear all subscribers
+     */
+    clear() {
+        this.#subscribers.clear();
+    }
+
 }
 
 export class Dx<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> {
@@ -36,11 +47,11 @@ export class Dx<P extends Pointer, E extends IEvent = IEvent, S extends Object =
     #scheme: Scheme<P, E, S>;
     #tx: Tx<PointerMap<P, E, S>>;
 
-    constructor(scheme: Scheme<P, E, S>, pointer: P, state: S, tx: Tx<PointerMap<P, E, S>>) {
+    constructor(scheme: Scheme<P, E, S>, pointer: P, state: S, subscribers: Subscribers<PointerMap<P, E, S>>) {
         this.#scheme = scheme;
         this.#pointer = pointer;
         this.#state = state;
-        this.#tx = tx;
+        this.#tx = new Tx(subscribers);
     }
 
     get pointer() {

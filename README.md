@@ -9,6 +9,8 @@ This lib use absolute imports. Keep in mind when assembling
 
 ## Usage
 ```typescript
+import FSM from '/fsmjs';
+
 // Define an interface that represented a volume with water
 interface Water {
     t: number
@@ -67,20 +69,20 @@ const scheme: Scheme<WaterAggregation, Heat, Water> = {
 const water: Water = { t: 0 };
 
 // Define FSM
-const { dx, rx } = fsm<WaterAggregation, Heat, Water>(scheme, WaterAggregation.Liquid, water);
+const fsm = new FSM<WaterAggregation, Heat, Water>(scheme, WaterAggregation.Liquid, water);
 
 // Subscribe on pointer changes
 // See more 'https://github.com/evgkch/channeljs'
-rx.on(WaterAggregation.Solid, (_, state) => { console.log(`water is solid; t = ${state.t}`); });
-rx.on(WaterAggregation.Liquid, (_, state) => { console.log(`water is liquid; t = ${state.t}`); });
-rx.on(WaterAggregation.Gas, (_, state) => { console.log(`water is gas; t = ${state.t}`); });
+fsm.rx.on(WaterAggregation.Solid, (_, state) => { console.log(`water is solid; t = ${state.t}`); });
+fsm.rx.on(WaterAggregation.Liquid, (_, state) => { console.log(`water is liquid; t = ${state.t}`); });
+fsm.rx.on(WaterAggregation.Gas, (_, state) => { console.log(`water is gas; t = ${state.t}`); });
 
 // Before t was 0. Next t is 20. The second listener works
-dx.dispatch(new Heat(20));
+fsm.dx.dispatch(new Heat(20));
 
 // Before t was 20. Next t is 100. The third listener works
-dx.dispatch(new Heat(80));
+fsm.dx.dispatch(new Heat(80));
 
 // Before t was 80. Next t is ... Ops! We had no transitions!. Listeners are silent
-dx.dispatch(new Heat(-200));
+fsm.dx.dispatch(new Heat(-200));
 ```
