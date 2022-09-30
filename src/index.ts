@@ -1,4 +1,4 @@
-import { Rx, Tx, Message, Subscribers } from '/channeljs';
+import { Rx, Tx, Message, Subscribers } from '/@lib/channeljs/index.js';
 
 export type Pointer = Message;
 

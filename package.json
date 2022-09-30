@@ -1,6 +1,6 @@
 {
   "name": "fsmjs",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "A lib to create a Finite State Machine",
   "main": "dist/index.js",
   "browser": "dist/index.js",
@@ -24,6 +24,6 @@
   "license": "MIT",
   "homepage": "https://github.com/evgkch/fsmjs",
   "dependencies": {
-    "channeljs": "github:evgkch/channeljs#v1.0.1"
+    "@lib/channeljs": "github:evgkch/channeljs#v1.0.1"
   }
 }

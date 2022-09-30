@@ -1,4 +1,4 @@
-import { Rx, Message, Subscribers } from '/channeljs';
+import { Rx, Message, Subscribers } from '/@lib/channeljs/index.js';
 export declare type Pointer = Message;
 export interface IEvent {
     type: Pointer;

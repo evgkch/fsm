@@ -10,7 +10,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _FSM_subscribers, _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx;
-import { Rx, Tx } from '/channeljs';
+import { Rx, Tx } from '/@lib/channeljs/index.js';
 export default class FSM {
     constructor(scheme, pointer, state) {
         _FSM_subscribers.set(this, new Map);
