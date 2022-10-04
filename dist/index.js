@@ -39,6 +39,9 @@ export class Dx {
     get pointer() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f");
     }
+    get state() {
+        return __classPrivateFieldGet(this, _Dx_state, "f");
+    }
     get is_active() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f") in __classPrivateFieldGet(this, _Dx_scheme, "f");
     }

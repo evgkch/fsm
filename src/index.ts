@@ -58,6 +58,10 @@ export class Dx<P extends Pointer, E extends IEvent = IEvent, S extends Object =
         return this.#pointer;
     }
 
+    get state() {
+        return this.#state;
+    }
+
     get is_active(): boolean {
         return this.#pointer in this.#scheme;
     }

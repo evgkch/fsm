@@ -28,6 +28,7 @@ export declare class Dx<P extends Pointer, E extends IEvent = IEvent, S extends 
     #private;
     constructor(scheme: Scheme<P, E, S>, pointer: P, state: S, subscribers: Subscribers<PointerMap<P, E, S>>);
     get pointer(): P;
+    get state(): S;
     get is_active(): boolean;
     dispatch(event: E): boolean;
     dispatch_async(event: E): Promise<boolean>;
