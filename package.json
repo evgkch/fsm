@@ -24,6 +24,6 @@
   "license": "MIT",
   "homepage": "https://github.com/evgkch/fsmjs",
   "dependencies": {
-    "@lib/channeljs": "github:evgkch/channeljs#v1.0.1"
+    "channeljs": "github:evgkch/channeljs#v1.0.1"
   }
 }

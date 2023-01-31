@@ -1,4 +1,4 @@
-import { Rx, Tx, Message, Subscribers } from '/@lib/channeljs/index.js';
+import { Rx, Tx, Message, Subscribers } from 'channeljs';
 
 export type Pointer = Message;
 
@@ -56,10 +56,6 @@ export class Dx<P extends Pointer, E extends IEvent = IEvent, S extends Object =
 
     get pointer() {
         return this.#pointer;
-    }
-
-    get state() {
-        return this.#state;
     }
 
     get is_active(): boolean {

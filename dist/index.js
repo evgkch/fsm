@@ -10,7 +10,7 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
 var _FSM_subscribers, _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx;
-import { Rx, Tx } from '/@lib/channeljs/index.js';
+import { Rx, Tx } from 'channeljs';
 export default class FSM {
     constructor(scheme, pointer, state) {
         _FSM_subscribers.set(this, new Map);
@@ -38,9 +38,6 @@ export class Dx {
     }
     get pointer() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f");
-    }
-    get state() {
-        return __classPrivateFieldGet(this, _Dx_state, "f");
     }
     get is_active() {
         return __classPrivateFieldGet(this, _Dx_pointer, "f") in __classPrivateFieldGet(this, _Dx_scheme, "f");
