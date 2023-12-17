@@ -1,34 +1,26 @@
-import { Rx, Message, Subscribers } from 'channeljs';
-export declare type Pointer = Message;
-export interface IEvent {
-    type: Pointer;
+import { Rx } from 'channeljs';
+export type Maybe<T> = T | void;
+export type State<P, C> = [P, C];
+export type StatePointer<S> = S extends State<infer P, any> ? P : never;
+export type StateContent<S> = S extends State<any, infer C> ? C : never;
+export interface Event {
+    type: any;
 }
-export declare type Transition<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> = {
-    to: P;
-    if: (event: E, state: S) => boolean;
-    update?: (event: E, state: S) => void;
-};
-export declare type Scheme<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> = {
-    [p in P]?: Transition<P, E, S>[];
-};
-export declare type PointerMap<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> = {
-    [p in P]: [event: E, state: Readonly<S>];
-};
-export default class FSM<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> {
+export type Transition<S> = S extends State<infer SP, infer SC> ? [
+    from: SP,
+    [
+        to: SP,
+        <E extends Event>(event: E, state: Readonly<SC>) => Maybe<SC>
+    ]
+] : never;
+export default class StateMachine<S extends State<any, any>> {
     #private;
-    readonly dx: Dx<P, E, S>;
-    readonly rx: Rx<PointerMap<P, E, S>>;
-    constructor(scheme: Scheme<P, E, S>, pointer: P, state: S);
-    /**
-     * Clear all subscribers
-     */
+    constructor(transitions: Transition<S>[], state: S);
+    get pointer(): any;
+    get content(): any;
+    get active(): boolean;
+    get rx(): Rx<[message: StatePointer<S>, args: [from: StatePointer<S>, event: Event]][]>;
+    dispatch(event: Event): boolean;
+    dispatch_async(event: Event): Promise<boolean>;
     clear(): void;
-}
-export declare class Dx<P extends Pointer, E extends IEvent = IEvent, S extends Object = {}> {
-    #private;
-    constructor(scheme: Scheme<P, E, S>, pointer: P, state: S, subscribers: Subscribers<PointerMap<P, E, S>>);
-    get pointer(): P;
-    get is_active(): boolean;
-    dispatch(event: E): boolean;
-    dispatch_async(event: E): Promise<boolean>;
 }

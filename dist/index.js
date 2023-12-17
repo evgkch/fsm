@@ -9,58 +9,56 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
     return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
 };
-var _FSM_subscribers, _Dx_pointer, _Dx_state, _Dx_scheme, _Dx_tx;
-import { Rx, Tx } from 'channeljs';
-export default class FSM {
-    constructor(scheme, pointer, state) {
-        _FSM_subscribers.set(this, new Map);
-        this.dx = new Dx(scheme, pointer, state, __classPrivateFieldGet(this, _FSM_subscribers, "f"));
-        this.rx = new Rx(__classPrivateFieldGet(this, _FSM_subscribers, "f"));
-    }
-    /**
-     * Clear all subscribers
-     */
-    clear() {
-        __classPrivateFieldGet(this, _FSM_subscribers, "f").clear();
-    }
-}
-_FSM_subscribers = new WeakMap();
-export class Dx {
-    constructor(scheme, pointer, state, subscribers) {
-        _Dx_pointer.set(this, void 0);
-        _Dx_state.set(this, void 0);
-        _Dx_scheme.set(this, void 0);
-        _Dx_tx.set(this, void 0);
-        __classPrivateFieldSet(this, _Dx_scheme, scheme, "f");
-        __classPrivateFieldSet(this, _Dx_pointer, pointer, "f");
-        __classPrivateFieldSet(this, _Dx_state, state, "f");
-        __classPrivateFieldSet(this, _Dx_tx, new Tx(subscribers), "f");
+var _StateMachine_channel, _StateMachine_scheme, _StateMachine_state;
+import Channel from 'channeljs';
+class StateMachine {
+    constructor(transitions, state) {
+        _StateMachine_channel.set(this, new Channel);
+        _StateMachine_scheme.set(this, new Map);
+        _StateMachine_state.set(this, void 0);
+        for (const transition of transitions) {
+            if (!__classPrivateFieldGet(this, _StateMachine_scheme, "f").has(transition[0])) {
+                __classPrivateFieldGet(this, _StateMachine_scheme, "f").set(transition[0], []);
+            }
+            __classPrivateFieldGet(this, _StateMachine_scheme, "f").get(transition[0]).push(transition[1]);
+        }
+        __classPrivateFieldSet(this, _StateMachine_state, state, "f");
     }
     get pointer() {
-        return __classPrivateFieldGet(this, _Dx_pointer, "f");
+        return __classPrivateFieldGet(this, _StateMachine_state, "f")[0];
     }
-    get is_active() {
-        return __classPrivateFieldGet(this, _Dx_pointer, "f") in __classPrivateFieldGet(this, _Dx_scheme, "f");
+    get content() {
+        return __classPrivateFieldGet(this, _StateMachine_state, "f")[1];
+    }
+    get active() {
+        return __classPrivateFieldGet(this, _StateMachine_scheme, "f").has(__classPrivateFieldGet(this, _StateMachine_state, "f")[this.pointer]);
+    }
+    get rx() {
+        return __classPrivateFieldGet(this, _StateMachine_channel, "f").rx;
     }
     dispatch(event) {
-        if (this.is_active) {
-            const ts = __classPrivateFieldGet(this, _Dx_scheme, "f")[__classPrivateFieldGet(this, _Dx_pointer, "f")];
-            if (ts) {
-                const t = ts.find(t => t.if(event, __classPrivateFieldGet(this, _Dx_state, "f")));
-                if (t) {
-                    __classPrivateFieldSet(this, _Dx_pointer, t.to, "f");
-                    if (t.update) {
-                        t.update(event, __classPrivateFieldGet(this, _Dx_state, "f"));
+        if (this.active) {
+            const from = __classPrivateFieldGet(this, _StateMachine_state, "f")[this.pointer];
+            if (__classPrivateFieldGet(this, _StateMachine_scheme, "f").has(from)) {
+                const transitions = __classPrivateFieldGet(this, _StateMachine_scheme, "f").get(from);
+                for (const transition of transitions) {
+                    const content = transition[1](event, this.content);
+                    if (content !== undefined) {
+                        __classPrivateFieldSet(this, _StateMachine_state, [transition[0], content], "f");
+                        __classPrivateFieldGet(this, _StateMachine_channel, "f").tx.send(transition[0], from, event);
+                        return true;
                     }
-                    __classPrivateFieldGet(this, _Dx_tx, "f").send(this.pointer, event, __classPrivateFieldGet(this, _Dx_state, "f"));
-                    return true;
                 }
             }
         }
         return false;
     }
     dispatch_async(event) {
-        return new Promise(resolve => setTimeout(() => resolve(this.dispatch(event)), 0));
+        return new Promise(resolve => setTimeout(() => resolve(this.dispatch.call(this, event)), 0));
+    }
+    clear() {
+        return __classPrivateFieldGet(this, _StateMachine_channel, "f").clear();
     }
 }
-_Dx_pointer = new WeakMap(), _Dx_state = new WeakMap(), _Dx_scheme = new WeakMap(), _Dx_tx = new WeakMap();
+_StateMachine_channel = new WeakMap(), _StateMachine_scheme = new WeakMap(), _StateMachine_state = new WeakMap();
+export default StateMachine;
